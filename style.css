@@ -2,7 +2,6 @@
 
 :root { 
     --magenta: #ff0055; 
-    --bg-solid: rgba(11, 14, 19, 0.95); /* Um pouco de transparência para não tapar tudo */
     --led-red: #ff3366; 
     --gold: #ffd700;
 }
@@ -14,7 +13,7 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: transparent; /* Deixa o fundo transparente para o vídeo aparecer atrás */
+    background: transparent !important; /* Garante transparência total para o vídeo */
 }
 
 body { 
@@ -24,7 +23,7 @@ body {
     align-items: flex-start;
 }
 
-/* O container principal agora se auto-ajusta */
+/* O container principal agora tem o fundo escuro */
 .bracket-display { 
     width: 1920px; 
     height: 1080px;
@@ -32,13 +31,17 @@ body {
     display: flex; 
     flex-direction: column; 
     gap: 30px;
-    transform-origin: top center; /* Garante que ele diminua a partir do topo */
-    transform: scale(0.5); /* Valor inicial, será controlado pelo JS ou ajustado manualmente aqui */
+    transform-origin: top center; 
+    transform: scale(0.5); 
     z-index: 10;
+    
+    /* ALTERAÇÃO AQUI: Fundo escuro apenas na área da bracket */
+    background: rgba(0, 0, 0, 0.95); 
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(0,0,0,1);
 }
 
-/* Se estiver muito grande, mude o scale(0.5) acima para 0.4 ou 0.35 */
-
+/* Resto do código permanece igual para manter o layout que deu certo */
 .bracket-row { display: flex; gap: 40px; align-items: flex-start; flex-wrap: nowrap; position: relative; }
 
 .label { 
