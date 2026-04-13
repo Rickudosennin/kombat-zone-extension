@@ -17,7 +17,6 @@ async function fetchTop8Data() {
         const phases = resPhases.data?.event?.phases;
 
         if (phases && phases.length > 0) {
-            // Busca automaticamente a fase final (Top 8)
             const targetPhase = phases.find(p => 
                 p.name.toLowerCase().includes("top 8") || 
                 p.name.toLowerCase().includes("finals")
@@ -25,7 +24,7 @@ async function fetchTop8Data() {
 
             loadSets(targetPhase.id);
         }
-    } catch (e) { console.error("Erro na conexão com start.gg"); }
+    } catch (e) { console.error("Erro na API"); }
 }
 
 async function loadSets(phaseId) {
@@ -34,7 +33,6 @@ async function loadSets(phaseId) {
         sets(page: 1, perPage: 40) {
           nodes {
             id fullRoundText round state
-            stream { id }
             slots { 
                 entrant { name } 
                 standing { stats { score { value } } } 
@@ -52,7 +50,7 @@ async function loadSets(phaseId) {
         });
         const resSets = await responseSets.json();
         if (resSets.data?.phase) renderBracket(resSets.data.phase.sets.nodes);
-    } catch (e) { console.error("Erro ao carregar partidas"); }
+    } catch (e) { console.error("Erro nos sets"); }
 }
 
 function renderBracket(sets) {
@@ -60,6 +58,7 @@ function renderBracket(sets) {
     const lRoot = document.getElementById('losers-root');
     wRoot.innerHTML = ''; lRoot.innerHTML = '';
     
+    // Agrupamos os rounds
     const winnersRounds = {};
     const losersRounds = {};
 
@@ -67,23 +66,21 @@ function renderBracket(sets) {
         if (!set.slots[0].entrant && !set.slots[1].entrant) return;
         
         if (set.round > 0) {
-            // Winners Bracket: Chave positiva
             if (!winnersRounds[set.round]) winnersRounds[set.round] = { title: set.fullRoundText, sets: [] };
             winnersRounds[set.round].sets.push(set);
         } else {
-            // Losers Bracket: Chave negativa
-            const rKey = Math.abs(set.round);
-            if (!losersRounds[rKey]) losersRounds[rKey] = { title: set.fullRoundText, sets: [] };
-            losersRounds[rKey].sets.push(set);
+            if (!losersRounds[set.round]) losersRounds[set.round] = { title: set.fullRoundText, sets: [] };
+            losersRounds[set.round].sets.push(set);
         }
     });
 
-    // Renderiza Winners: Ordem crescente (Round 1 -> Final)
+    // Winners: Ordem crescente (1, 2, 3...)
     Object.keys(winnersRounds).sort((a, b) => a - b).forEach(r => {
         appendColumn(winnersRounds[r], wRoot);
     });
 
-    // Renderiza Losers: Ordem DECRESCENTE (Corrige a sequência para mostrar Round 1 primeiro)
+    // LOSERS CORRIGIDA: No start.gg, Losers Round 1 é o número negativo mais "baixo" (ex: -1, -2...). 
+    // Para mostrar do começo ao fim, precisamos ordenar de forma DECRESCENTE (-1, -2, -3...)
     Object.keys(losersRounds).sort((a, b) => b - a).forEach(r => {
         appendColumn(losersRounds[r], lRoot);
     });
@@ -96,7 +93,7 @@ function appendColumn(roundData, container) {
     
     roundData.sets.forEach(set => {
         const card = document.createElement('div');
-        card.className = `match-card ${set.state === 2 && set.stream ? 'on-stream' : ''}`;
+        card.className = 'match-card';
         const s1 = set.slots[0].standing?.stats.score.value;
         const s2 = set.slots[1].standing?.stats.score.value;
         
@@ -114,5 +111,4 @@ function appendColumn(roundData, container) {
     container.appendChild(col);
 }
 
-// Atualização automática para acompanhar a live
 setInterval(fetchTop8Data, 30000);
