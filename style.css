@@ -16,28 +16,27 @@ body {
     margin: 0; 
     overflow: hidden; 
     position: relative;
-    /* Ajuste de escala para o Top 8 ocupar bem o espaço */
     transform: scale(0.9);
     transform-origin: top left;
 }
 
-.bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 20px; }
+.bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 25px; }
 .bracket-row { display: flex; gap: 40px; align-items: flex-start; position: relative; }
 
 .label { 
-    color: #ffffff; text-transform: uppercase; font-size: 26px; 
+    color: #ffffff; text-transform: uppercase; font-size: 28px; 
     margin-bottom: 15px; border-left: 8px solid var(--magenta); padding-left: 15px; 
 }
 
-.column { display: flex; flex-direction: column; gap: 30px; min-width: 340px; }
+.column { display: flex; flex-direction: column; gap: 35px; min-width: 350px; }
 .round-title { font-size: 18px; color: #888; border-bottom: 1px solid #333; padding-bottom: 8px; text-transform: uppercase; }
 
-.match-card { background: #161a21; width: 340px; border: 1px solid #333; position: relative; z-index: 10; }
+.match-card { background: #161a21; width: 350px; border: 1px solid #333; position: relative; z-index: 10; }
 .match-card.on-stream { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
 
-.player { display: flex; justify-content: space-between; align-items: center; height: 55px; padding-left: 15px; border-bottom: 1px solid #000; }
-.name { font-size: 22px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
-.score { background: #232933; width: 60px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 26px; font-weight: bold; }
+.player { display: flex; justify-content: space-between; align-items: center; height: 60px; padding-left: 20px; border-bottom: 1px solid #000; }
+.name { font-size: 22px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px; }
+.score { background: #232933; width: 65px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: bold; }
 
 .winner { border-left: 6px solid var(--led-red); background: rgba(255, 51, 102, 0.15); }
 .winner .score { background: var(--led-red); }
