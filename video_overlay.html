@@ -15,7 +15,7 @@
         }
 
         body { 
-            background: var(--bg-solid); 
+            background: var(--bg-solid); /* Fundo totalmente sólido */
             color: white; 
             font-family: 'Oswald', sans-serif; 
             width: 1920px; 
@@ -23,29 +23,37 @@
             margin: 0; 
             overflow: hidden; 
             position: relative;
-            transform: scale(0.88);
-            transform-origin: top left;
         }
 
-        .bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 30px; }
-        .bracket-row { display: flex; gap: 35px; align-items: flex-start; }
+        .bracket-display { 
+            padding: 50px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 40px; 
+            background: var(--bg-solid); 
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .bracket-row { display: flex; gap: 60px; align-items: flex-start; }
 
         .label { 
             color: #ffffff; text-transform: uppercase; font-size: 28px; 
             margin-bottom: 15px; border-left: 8px solid var(--magenta); padding-left: 15px; 
+            letter-spacing: 2px;
         }
 
-        .column { display: flex; flex-direction: column; gap: 25px; min-width: 320px; }
-        .round-title { font-size: 16px; color: #777; border-bottom: 1px solid #333; padding-bottom: 5px; text-transform: uppercase; }
+        .column { display: flex; flex-direction: column; gap: 40px; min-width: 420px; }
+        .round-title { font-size: 20px; text-transform: uppercase; color: #777; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 10px; }
 
-        .match-card { background: #161a21; width: 320px; border: 1px solid #222; }
-        .match-card.on-stream { border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .match-card { background: #161a21; width: 420px; border: 2px solid #333; }
+        .match-card.on-stream { border: 2px solid var(--gold); box-shadow: 0 0 25px rgba(255, 215, 0, 0.3); }
 
-        .player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding-left: 15px; border-bottom: 1px solid #000; }
-        .name { font-size: 20px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; }
-        .score { background: #1c222b; width: 55px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; }
+        .player { display: flex; justify-content: space-between; align-items: center; height: 65px; padding-left: 20px; border-bottom: 2px solid #000; }
+        .name { font-size: 24px; text-transform: uppercase; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+        .score { background: #232933; width: 70px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: bold; }
 
-        .winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
+        .winner { border-left: 8px solid var(--led-red); background: rgba(255, 51, 102, 0.15); }
         .winner .score { background: var(--led-red); }
     </style>
 </head>
@@ -89,7 +97,7 @@
 
                 loadSets(targetPhase.id);
             }
-        } catch (e) { console.error("Erro na API"); }
+        } catch (e) { console.error("Erro API"); }
     }
 
     async function loadSets(phaseId) {
@@ -116,7 +124,7 @@
             });
             const resSets = await responseSets.json();
             if (resSets.data?.phase) renderBracket(resSets.data.phase.sets.nodes);
-        } catch (e) { console.error("Erro nos sets"); }
+        } catch (e) { console.error("Erro Sets"); }
     }
 
     function renderBracket(sets) {
@@ -134,20 +142,15 @@
                 if (!winnersRounds[set.round]) winnersRounds[set.round] = { title: set.fullRoundText, sets: [] };
                 winnersRounds[set.round].sets.push(set);
             } else {
-                // Mantemos o valor negativo para organizar a sequência da Losers
                 if (!losersRounds[set.round]) losersRounds[set.round] = { title: set.fullRoundText, sets: [] };
                 losersRounds[set.round].sets.push(set);
             }
         });
 
-        // Winners: 1, 2, 3...
         Object.keys(winnersRounds).sort((a, b) => a - b).forEach(r => {
             appendColumn(winnersRounds[r], wRoot);
         });
 
-        // Losers CORREÇÃO: No start.gg, o Round 1 é o número negativo "menor" (-1)
-        // e a Final é o número negativo "maior" (-5). 
-        // Ordenamos b - a para que -1 apareça antes de -5 na tela.
         Object.keys(losersRounds).sort((a, b) => b - a).forEach(r => {
             appendColumn(losersRounds[r], lRoot);
         });
@@ -178,8 +181,7 @@
         container.appendChild(col);
     }
 
-    setInterval(fetchTop8Data, 60000);
+    setInterval(fetchTop8Data, 45000);
 </script>
-
 </body>
 </html>
