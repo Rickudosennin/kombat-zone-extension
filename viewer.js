@@ -17,6 +17,7 @@ async function fetchTop8Data() {
         const phases = resPhases.data?.event?.phases;
 
         if (phases && phases.length > 0) {
+            // Busca automaticamente a fase final (Top 8)
             const targetPhase = phases.find(p => 
                 p.name.toLowerCase().includes("top 8") || 
                 p.name.toLowerCase().includes("finals")
@@ -24,7 +25,7 @@ async function fetchTop8Data() {
 
             loadSets(targetPhase.id);
         }
-    } catch (e) { console.error("Erro na API"); }
+    } catch (e) { console.error("Erro na conexão com start.gg"); }
 }
 
 async function loadSets(phaseId) {
@@ -51,7 +52,7 @@ async function loadSets(phaseId) {
         });
         const resSets = await responseSets.json();
         if (resSets.data?.phase) renderBracket(resSets.data.phase.sets.nodes);
-    } catch (e) { console.error("Erro nos sets"); }
+    } catch (e) { console.error("Erro ao carregar partidas"); }
 }
 
 function renderBracket(sets) {
@@ -66,23 +67,23 @@ function renderBracket(sets) {
         if (!set.slots[0].entrant && !set.slots[1].entrant) return;
         
         if (set.round > 0) {
+            // Winners Bracket: Chave positiva
             if (!winnersRounds[set.round]) winnersRounds[set.round] = { title: set.fullRoundText, sets: [] };
             winnersRounds[set.round].sets.push(set);
         } else {
-            // Usamos valor absoluto para facilitar a ordenação da losers
+            // Losers Bracket: Chave negativa
             const rKey = Math.abs(set.round);
             if (!losersRounds[rKey]) losersRounds[rKey] = { title: set.fullRoundText, sets: [] };
             losersRounds[rKey].sets.push(set);
         }
     });
 
-    // Renderiza Winners: Ordem Crescente (1, 2, 3...)
+    // Renderiza Winners: Ordem crescente (Round 1 -> Final)
     Object.keys(winnersRounds).sort((a, b) => a - b).forEach(r => {
         appendColumn(winnersRounds[r], wRoot);
     });
 
-    // Renderiza Losers: Ordem Decrescente para corrigir a sequência (ex: Round 1 -> Final)
-    // No start.gg, Losers Round 1 é o número negativo mais alto (ex: -5), então invertemos
+    // Renderiza Losers: Ordem DECRESCENTE (Corrige a sequência para mostrar Round 1 primeiro)
     Object.keys(losersRounds).sort((a, b) => b - a).forEach(r => {
         appendColumn(losersRounds[r], lRoot);
     });
@@ -113,4 +114,5 @@ function appendColumn(roundData, container) {
     container.appendChild(col);
 }
 
-setInterval(fetchTop8Data, 45000);
+// Atualização automática para acompanhar a live
+setInterval(fetchTop8Data, 60000);
