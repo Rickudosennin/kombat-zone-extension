@@ -4,6 +4,7 @@
     --magenta: #ff0055; 
     --bg-solid: #0b0e13; 
     --led-red: #ff3366; 
+    --gold: #ffd700;
 }
 
 body { 
@@ -14,11 +15,13 @@ body {
     height: 1080px; 
     margin: 0; 
     overflow: hidden; 
+    position: relative;
+    /* Ajuste de escala para o Top 8 preencher a tela */
     transform: scale(0.88);
     transform-origin: top left;
 }
 
-.bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 30px; }
+.bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 20px; }
 .bracket-row { display: flex; gap: 35px; align-items: flex-start; }
 
 .label { 
@@ -29,7 +32,9 @@ body {
 .column { display: flex; flex-direction: column; gap: 25px; min-width: 320px; }
 .round-title { font-size: 16px; color: #777; border-bottom: 1px solid #333; padding-bottom: 5px; text-transform: uppercase; }
 
-.match-card { background: #161a21; width: 320px; border: 1px solid #222; }
+.match-card { background: #161a21; width: 320px; border: 1px solid #222; position: relative; }
+.match-card.on-stream { border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+
 .player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding-left: 15px; border-bottom: 1px solid #000; }
 .name { font-size: 20px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; }
 .score { background: #1c222b; width: 55px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; }
