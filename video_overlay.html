@@ -2,8 +2,52 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
+    <title>Kombat Zone - Bracket Overlay</title>
     <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+        :root { 
+            --magenta: #ff0055; 
+            --bg-solid: #0b0e13; 
+            --led-red: #ff3366; 
+            --gold: #ffd700;
+        }
+
+        body { 
+            background: var(--bg-solid); 
+            color: white; 
+            font-family: 'Oswald', sans-serif; 
+            width: 1920px; 
+            height: 1080px; 
+            margin: 0; 
+            overflow: hidden; 
+            position: relative;
+            transform: scale(0.88);
+            transform-origin: top left;
+        }
+
+        .bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 30px; }
+        .bracket-row { display: flex; gap: 35px; align-items: flex-start; }
+
+        .label { 
+            color: #ffffff; text-transform: uppercase; font-size: 28px; 
+            margin-bottom: 15px; border-left: 8px solid var(--magenta); padding-left: 15px; 
+        }
+
+        .column { display: flex; flex-direction: column; gap: 25px; min-width: 320px; }
+        .round-title { font-size: 16px; color: #777; border-bottom: 1px solid #333; padding-bottom: 5px; text-transform: uppercase; }
+
+        .match-card { background: #161a21; width: 320px; border: 1px solid #222; }
+        .match-card.on-stream { border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+
+        .player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding-left: 15px; border-bottom: 1px solid #000; }
+        .name { font-size: 20px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; }
+        .score { background: #1c222b; width: 55px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; }
+
+        .winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
+        .winner .score { background: var(--led-red); }
+    </style>
 </head>
 <body>
 
@@ -18,6 +62,124 @@
     </div>
 </div>
 
-<script src="viewer.js"></script>
+<script>
+    const TOKEN = "43b15884e09284466a58db7b06350b50";
+    const EVENT_SLUG = "tournament/kombat-zone-iron-fist-8-powered-by-exitlag/event/kz-iron-fist-8";
+
+    window.Twitch.ext.onAuthorized((auth) => {
+        fetchTop8Data();
+    });
+
+    async function fetchTop8Data() {
+        const queryPhases = `query GetPhases($slug: String) { event(slug: $slug) { phases { id name } } }`;
+        try {
+            const responsePhases = await fetch('https://api.start.gg/gql/alpha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+                body: JSON.stringify({ query: queryPhases, variables: { slug: EVENT_SLUG } }),
+            });
+            const resPhases = await responsePhases.json();
+            const phases = resPhases.data?.event?.phases;
+
+            if (phases && phases.length > 0) {
+                const targetPhase = phases.find(p => 
+                    p.name.toLowerCase().includes("top 8") || 
+                    p.name.toLowerCase().includes("finals")
+                ) || phases[phases.length - 1];
+
+                loadSets(targetPhase.id);
+            }
+        } catch (e) { console.error("Erro na API"); }
+    }
+
+    async function loadSets(phaseId) {
+        const querySets = `query GetSets($phaseId: ID) {
+          phase(id: $phaseId) {
+            sets(page: 1, perPage: 40) {
+              nodes {
+                id fullRoundText round state
+                stream { id }
+                slots { 
+                    entrant { name } 
+                    standing { stats { score { value } } } 
+                }
+              }
+            }
+          }
+        }`;
+
+        try {
+            const responseSets = await fetch('https://api.start.gg/gql/alpha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+                body: JSON.stringify({ query: querySets, variables: { phaseId } }),
+            });
+            const resSets = await responseSets.json();
+            if (resSets.data?.phase) renderBracket(resSets.data.phase.sets.nodes);
+        } catch (e) { console.error("Erro nos sets"); }
+    }
+
+    function renderBracket(sets) {
+        const wRoot = document.getElementById('winners-root');
+        const lRoot = document.getElementById('losers-root');
+        wRoot.innerHTML = ''; lRoot.innerHTML = '';
+        
+        const winnersRounds = {};
+        const losersRounds = {};
+
+        sets.forEach(set => {
+            if (!set.slots[0].entrant && !set.slots[1].entrant) return;
+            
+            if (set.round > 0) {
+                if (!winnersRounds[set.round]) winnersRounds[set.round] = { title: set.fullRoundText, sets: [] };
+                winnersRounds[set.round].sets.push(set);
+            } else {
+                // Mantemos o valor negativo para organizar a sequência da Losers
+                if (!losersRounds[set.round]) losersRounds[set.round] = { title: set.fullRoundText, sets: [] };
+                losersRounds[set.round].sets.push(set);
+            }
+        });
+
+        // Winners: 1, 2, 3...
+        Object.keys(winnersRounds).sort((a, b) => a - b).forEach(r => {
+            appendColumn(winnersRounds[r], wRoot);
+        });
+
+        // Losers CORREÇÃO: No start.gg, o Round 1 é o número negativo "menor" (-1)
+        // e a Final é o número negativo "maior" (-5). 
+        // Ordenamos b - a para que -1 apareça antes de -5 na tela.
+        Object.keys(losersRounds).sort((a, b) => b - a).forEach(r => {
+            appendColumn(losersRounds[r], lRoot);
+        });
+    }
+
+    function appendColumn(roundData, container) {
+        const col = document.createElement('div');
+        col.className = 'column';
+        col.innerHTML = `<div class="round-title">${roundData.title}</div>`;
+        
+        roundData.sets.forEach(set => {
+            const card = document.createElement('div');
+            card.className = `match-card ${set.state === 2 && set.stream ? 'on-stream' : ''}`;
+            const s1 = set.slots[0].standing?.stats.score.value;
+            const s2 = set.slots[1].standing?.stats.score.value;
+            
+            card.innerHTML = `
+                <div class="player ${set.state === 3 && s1 > s2 ? 'winner' : ''}">
+                    <div class="name">${set.slots[0].entrant?.name || 'TBD'}</div>
+                    <div class="score">${s1 !== null && s1 >= 0 ? s1 : (s1 < 0 ? 'DQ' : '-')}</div>
+                </div>
+                <div class="player ${set.state === 3 && s2 > s1 ? 'winner' : ''}">
+                    <div class="name">${set.slots[1].entrant?.name || 'TBD'}</div>
+                    <div class="score">${s2 !== null && s2 >= 0 ? s2 : (s2 < 0 ? 'DQ' : '-')}</div>
+                </div>`;
+            col.appendChild(card);
+        });
+        container.appendChild(col);
+    }
+
+    setInterval(fetchTop8Data, 60000);
+</script>
+
 </body>
 </html>
