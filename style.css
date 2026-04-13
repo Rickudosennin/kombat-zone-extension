@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto+Condensed:ital,wght@1,700&display=swap');
+
+:root { 
+    --magenta: #ff0055; 
+    --bg-solid: #0b0e13; 
+    --led-red: #ff3366; 
+    --gold: #ffd700;
+}
+
+body { 
+    background: var(--bg-solid); /* Mude para transparent se quiser ver o jogo atrás */
+    color: white; 
+    font-family: 'Oswald', sans-serif; 
+    width: 1920px; 
+    height: 1080px; 
+    margin: 0; 
+    overflow: hidden; 
+    position: relative;
+}
+
+.flag-img {
+    width: 35px;
+    height: auto;
+    margin-right: 12px;
+    border-radius: 3px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.8);
+    flex-shrink: 0;
+}
+
+.phase-nav { 
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; gap: 15px; padding: 20px 40px; 
+    background: rgba(0, 0, 0, 0.9); border-bottom: 4px solid var(--magenta); 
+    align-items: center; z-index: 2000;
+    transition: all 0.3s ease-in-out;
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.show-nav { transform: translateY(0); opacity: 1; }
+
+.btn-phase { 
+    background: #222; color: #aaa; border: 1px solid #444; 
+    padding: 12px 24px; cursor: pointer; text-transform: uppercase; 
+    font-family: 'Oswald'; font-size: 18px;
+}
+.btn-phase.active { background: var(--magenta); color: white; border-color: white; }
+
+.bracket-display { padding: 50px; display: flex; flex-direction: column; gap: 40px; margin-top: 20px; position: relative; z-index: 10; }
+.bracket-row { display: flex; gap: 60px; align-items: flex-start; min-height: 200px; flex-wrap: nowrap; position: relative; }
+
+.label { 
+    color: #ffffff; text-transform: uppercase; font-size: 28px; 
+    margin-bottom: 15px; border-left: 8px solid var(--magenta); padding-left: 15px; 
+    letter-spacing: 2px;
+}
+
+.column { display: flex; flex-direction: column; gap: 40px; min-width: 420px; position: relative; }
+.round-title { 
+    font-size: 20px; text-transform: uppercase; color: #ffffff; 
+    border-bottom: 2px solid #444; padding-bottom: 8px; margin-bottom: 10px; 
+}
+
+.match-card { 
+    background: #161a21; width: 420px; border: 2px solid #333; 
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6); 
+    position: relative;
+    z-index: 20;
+}
+
+.match-card.on-stream {
+    border: 2px solid var(--gold) !important;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+}
+.match-card.on-stream::after {
+    content: "LIVE ON STREAM";
+    position: absolute; top: -18px; right: -2px;
+    background: var(--gold); color: black;
+    font-size: 11px; font-weight: 900; padding: 2px 10px; border-radius: 2px;
+}
+
+.player { display: flex; justify-content: space-between; align-items: center; height: 65px; padding: 0 0 0 20px; border-bottom: 2px solid #000; position: relative; }
+.name-container { display: flex; align-items: center; overflow: hidden; }
+.name { font-size: 24px; text-transform: uppercase; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; color: white; }
+.score { background: #232933; width: 70px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 32px; color: #ffffff; font-weight: bold; }
+
+.winner { border-left: 8px solid var(--led-red); background: rgba(255, 51, 102, 0.15); box-shadow: -5px 0 15px rgba(255, 51, 102, 0.5); }
+.winner .score { background: var(--led-red); }
+.loser .name { color: #cccccc; }
+
+.connector { position: absolute; background: #333; z-index: 5; overflow: hidden; pointer-events: none; }
+.led-flow { position: absolute; background: var(--led-red); box-shadow: 0 0 10px var(--led-red), 0 0 20px var(--led-red); animation: led-animation 2s linear infinite; }
+
+@keyframes led-animation { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes led-animation-v-down { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+@keyframes led-animation-v-up { 0% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }
+
+.empty-area { display: none; }
