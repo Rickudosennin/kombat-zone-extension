@@ -2,36 +2,38 @@ const TOKEN = "43b15884e09284466a58db7b06350b50";
 const EVENT_SLUG = "tournament/kombat-zone-iron-fist-8-powered-by-exitlag/event/kz-iron-fist-8";
 
 window.Twitch.ext.onAuthorized((auth) => {
-    autoSelectTop8();
+    fetchTop8Data();
 });
 
-async function autoSelectTop8() {
-    const query = `query GetPhases($slug: String) { event(slug: $slug) { phases { id name } } }`;
+async function fetchTop8Data() {
+    // Primeiro, pegamos as fases para identificar qual é o Top 8
+    const queryPhases = `query GetPhases($slug: String) { event(slug: $slug) { phases { id name } } }`;
+    
     try {
-        const response = await fetch('https://api.start.gg/gql/alpha', {
+        const responsePhases = await fetch('https://api.start.gg/gql/alpha', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
-            body: JSON.stringify({ query, variables: { slug: EVENT_SLUG } }),
+            body: JSON.stringify({ query: queryPhases, variables: { slug: EVENT_SLUG } }),
         });
-        const res = await response.json();
-        const phases = res.data?.event?.phases;
-        
+        const resPhases = await responsePhases.json();
+        const phases = resPhases.data?.event?.phases;
+
         if (phases && phases.length > 0) {
-            // Tenta encontrar a fase que diz "Top 8" ou "Finals"
-            const top8Phase = phases.find(p => 
+            // Filtra para encontrar a fase de encerramento (Top 8 / Finals)
+            const targetPhase = phases.find(p => 
                 p.name.toLowerCase().includes("top 8") || 
                 p.name.toLowerCase().includes("finals")
-            ) || phases[phases.length - 1]; // Se não achar, pega a última fase
-            
-            loadSets(top8Phase.id);
+            ) || phases[phases.length - 1]; // Se não achar pelo nome, pega a última fase criada
+
+            loadSets(targetPhase.id);
         }
-    } catch (e) { console.error("Erro ao buscar fases"); }
+    } catch (e) { console.error("Erro ao identificar fase final"); }
 }
 
 async function loadSets(phaseId) {
-    const query = `query GetSets($phaseId: ID) {
+    const querySets = `query GetSets($phaseId: ID) {
       phase(id: $phaseId) {
-        sets(page: 1, perPage: 40) {
+        sets(page: 1, perPage: 30) {
           nodes {
             id fullRoundText round state
             stream { id }
@@ -43,15 +45,16 @@ async function loadSets(phaseId) {
         }
       }
     }`;
+
     try {
-        const response = await fetch('https://api.start.gg/gql/alpha', {
+        const responseSets = await fetch('https://api.start.gg/gql/alpha', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
-            body: JSON.stringify({ query, variables: { phaseId } }),
+            body: JSON.stringify({ query: querySets, variables: { phaseId } }),
         });
-        const res = await response.json();
-        if (res.data?.phase) renderBracket(res.data.phase.sets.nodes);
-    } catch (e) { console.error("Erro ao carregar sets"); }
+        const resSets = await responseSets.json();
+        if (resSets.data?.phase) renderBracket(resSets.data.phase.sets.nodes);
+    } catch (e) { console.error("Erro ao carregar partidas"); }
 }
 
 function renderBracket(sets) {
@@ -94,5 +97,5 @@ function renderBracket(sets) {
     });
 }
 
-// Atualiza a cada minuto para não sobrecarregar
-setInterval(() => autoSelectTop8(), 60000);
+// Atualiza a cada 45 segundos
+setInterval(fetchTop8Data, 45000);
