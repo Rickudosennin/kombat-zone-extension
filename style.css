@@ -4,7 +4,6 @@
     --magenta: #ff0055; 
     --bg-solid: #0b0e13; 
     --led-red: #ff3366; 
-    --gold: #ffd700;
 }
 
 body { 
@@ -15,33 +14,25 @@ body {
     height: 1080px; 
     margin: 0; 
     overflow: hidden; 
-    position: relative;
-    transform: scale(0.9);
+    transform: scale(0.88);
     transform-origin: top left;
 }
 
-.bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 25px; }
-.bracket-row { display: flex; gap: 40px; align-items: flex-start; position: relative; }
+.bracket-display { padding: 40px; display: flex; flex-direction: column; gap: 30px; }
+.bracket-row { display: flex; gap: 35px; align-items: flex-start; }
 
 .label { 
     color: #ffffff; text-transform: uppercase; font-size: 28px; 
     margin-bottom: 15px; border-left: 8px solid var(--magenta); padding-left: 15px; 
 }
 
-.column { display: flex; flex-direction: column; gap: 35px; min-width: 350px; }
-.round-title { font-size: 18px; color: #888; border-bottom: 1px solid #333; padding-bottom: 8px; text-transform: uppercase; }
+.column { display: flex; flex-direction: column; gap: 25px; min-width: 320px; }
+.round-title { font-size: 16px; color: #777; border-bottom: 1px solid #333; padding-bottom: 5px; text-transform: uppercase; }
 
-.match-card { background: #161a21; width: 350px; border: 1px solid #333; position: relative; z-index: 10; }
-.match-card.on-stream { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+.match-card { background: #161a21; width: 320px; border: 1px solid #222; }
+.player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding-left: 15px; border-bottom: 1px solid #000; }
+.name { font-size: 20px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; }
+.score { background: #1c222b; width: 55px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; }
 
-.player { display: flex; justify-content: space-between; align-items: center; height: 60px; padding-left: 20px; border-bottom: 1px solid #000; }
-.name { font-size: 22px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px; }
-.score { background: #232933; width: 65px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: bold; }
-
-.winner { border-left: 6px solid var(--led-red); background: rgba(255, 51, 102, 0.15); }
+.winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
 .winner .score { background: var(--led-red); }
-
-.connector { position: absolute; background: #333; z-index: 1; }
-.led-flow { position: absolute; background: var(--led-red); box-shadow: 0 0 10px var(--led-red); animation: led-flow 2s linear infinite; }
-
-@keyframes led-flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
