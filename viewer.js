@@ -1,13 +1,11 @@
 const TOKEN = "43b15884e09284466a58db7b06350b50";
 const EVENT_SLUG = "tournament/kombat-zone-iron-fist-8-powered-by-exitlag/event/kz-iron-fist-8";
 
-let currentPhaseId = null;
-
 window.Twitch.ext.onAuthorized((auth) => {
-    loadPhases();
+    autoSelectTop8();
 });
 
-async function loadPhases() {
+async function autoSelectTop8() {
     const query = `query GetPhases($slug: String) { event(slug: $slug) { phases { id name } } }`;
     try {
         const response = await fetch('https://api.start.gg/gql/alpha', {
@@ -16,39 +14,24 @@ async function loadPhases() {
             body: JSON.stringify({ query, variables: { slug: EVENT_SLUG } }),
         });
         const res = await response.json();
-        if (res.data?.event?.phases) {
-            const phases = res.data.event.phases;
-            renderNav(phases);
-            if (!currentPhaseId) changePhase(phases[0].id);
+        const phases = res.data?.event?.phases;
+        
+        if (phases && phases.length > 0) {
+            // Tenta encontrar a fase que diz "Top 8" ou "Finals"
+            const top8Phase = phases.find(p => 
+                p.name.toLowerCase().includes("top 8") || 
+                p.name.toLowerCase().includes("finals")
+            ) || phases[phases.length - 1]; // Se não achar, pega a última fase
+            
+            loadSets(top8Phase.id);
         }
-    } catch (e) { console.error("Erro start.gg phases"); }
+    } catch (e) { console.error("Erro ao buscar fases"); }
 }
 
-function changePhase(id) {
-    currentPhaseId = id;
-    document.querySelectorAll('.btn-phase').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-id') == id);
-    });
-    loadSets();
-}
-
-function renderNav(phases) {
-    const nav = document.getElementById('phase-nav');
-    nav.innerHTML = '';
-    phases.forEach(p => {
-        const btn = document.createElement('button');
-        btn.className = 'btn-phase';
-        btn.setAttribute('data-id', p.id);
-        btn.innerText = p.name;
-        btn.onclick = () => changePhase(p.id);
-        nav.appendChild(btn);
-    });
-}
-
-async function loadSets() {
+async function loadSets(phaseId) {
     const query = `query GetSets($phaseId: ID) {
       phase(id: $phaseId) {
-        sets(page: 1, perPage: 50) {
+        sets(page: 1, perPage: 40) {
           nodes {
             id fullRoundText round state
             stream { id }
@@ -64,11 +47,11 @@ async function loadSets() {
         const response = await fetch('https://api.start.gg/gql/alpha', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
-            body: JSON.stringify({ query, variables: { phaseId: currentPhaseId } }),
+            body: JSON.stringify({ query, variables: { phaseId } }),
         });
         const res = await response.json();
         if (res.data?.phase) renderBracket(res.data.phase.sets.nodes);
-    } catch (e) { console.error("Erro start.gg sets"); }
+    } catch (e) { console.error("Erro ao carregar sets"); }
 }
 
 function renderBracket(sets) {
@@ -83,7 +66,6 @@ function renderBracket(sets) {
         rounds[set.round].sets.push(set);
     });
 
-    const setMap = new Map();
     Object.keys(rounds).sort((a, b) => a - b).forEach(r => {
         const col = document.createElement('div');
         col.className = 'column';
@@ -98,14 +80,13 @@ function renderBracket(sets) {
             card.innerHTML = `
                 <div class="player ${set.state === 3 && s1 > s2 ? 'winner' : ''}">
                     <div class="name">${set.slots[0].entrant?.name || 'TBD'}</div>
-                    <div class="score">${s1 !== null ? s1 : '-'}</div>
+                    <div class="score">${s1 !== null && s1 >= 0 ? s1 : (s1 < 0 ? 'DQ' : '-')}</div>
                 </div>
                 <div class="player ${set.state === 3 && s2 > s1 ? 'winner' : ''}">
                     <div class="name">${set.slots[1].entrant?.name || 'TBD'}</div>
-                    <div class="score">${s2 !== null ? s2 : '-'}</div>
+                    <div class="score">${s2 !== null && s2 >= 0 ? s2 : (s2 < 0 ? 'DQ' : '-')}</div>
                 </div>`;
             col.appendChild(card);
-            setMap.set(set.id, card);
         });
         
         if (parseInt(r) > 0) wRoot.appendChild(col);
@@ -113,4 +94,5 @@ function renderBracket(sets) {
     });
 }
 
-setInterval(loadSets, 60000);
+// Atualiza a cada minuto para não sobrecarregar
+setInterval(() => autoSelectTop8(), 60000);
