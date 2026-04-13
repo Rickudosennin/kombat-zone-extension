@@ -115,4 +115,4 @@ function appendColumn(roundData, container) {
 }
 
 // Atualização automática para acompanhar a live
-setInterval(fetchTop8Data, 60000);
+setInterval(fetchTop8Data, 30000);
