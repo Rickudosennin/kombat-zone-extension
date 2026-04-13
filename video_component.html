@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <style>
+        /* No componente de vídeo, o fundo costuma ser ainda mais discreto */
+        #app { width: 280px; background: rgba(0, 0, 0, 0.9); }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <span class="live-indicator">●</span>
+            <span class="title">BRACKET INTERATIVA</span>
+        </div>
+        <div id="bracket-container">
+            <p class="status-msg">Buscando chaves...</p>
+        </div>
+    </div>
+    <script src="viewer.js"></script>
+</body>
+</html>

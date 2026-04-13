@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Inter', Arial, sans-serif;
+    color: white;
+    background: transparent;
+}
+
+#app {
+    width: 300px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid #333;
+    border-top: 4px solid #ff4655; /* Vermelho Kombat Zone */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #1a1a1a;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.live-indicator {
+    color: #ff4655;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+.set-card {
+    padding: 12px;
+    border-bottom: 1px solid #222;
+}
+
+.round-name {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.score-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-msg {
+    padding: 20px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
