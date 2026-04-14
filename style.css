@@ -8,7 +8,7 @@
     --card-bg: #161a21;
 }
 
-body { font-family: 'Oswald', sans-serif; background: transparent; margin: 0; overflow: hidden; }
+body { font-family: 'Oswald', sans-serif; background: transparent; margin: 0; overflow: hidden; color: white; }
 
 .phase-nav { 
     display: flex; gap: 10px; padding: 10px; justify-content: center; 
@@ -16,7 +16,7 @@ body { font-family: 'Oswald', sans-serif; background: transparent; margin: 0; ov
 }
 
 .btn-phase { 
-    background: #222; color: #aaa; border: 1px solid #444; padding: 6px 14px; 
+    background: #222; color: #ffffff; border: 1px solid #444; padding: 6px 14px; 
     cursor: pointer; text-transform: uppercase; font-size: 13px; font-family: 'Oswald';
 }
 .btn-phase.active { background: var(--magenta); color: white; border-color: white; }
@@ -27,25 +27,21 @@ body { font-family: 'Oswald', sans-serif; background: transparent; margin: 0; ov
     max-height: 78vh; overflow: auto; position: relative;
 }
 
-.label { font-size: 24px; text-transform: uppercase; border-left: 8px solid var(--magenta); padding-left: 15px; margin-bottom: 20px; }
+.label { font-size: 24px; text-transform: uppercase; border-left: 8px solid var(--magenta); padding-left: 15px; margin-bottom: 20px; color: #ffffff; }
 .bracket-row { display: flex; gap: 50px; align-items: flex-start; }
 .column { display: flex; flex-direction: column; gap: 30px; min-width: 300px; }
-.round-title { font-size: 16px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 6px; }
+.round-title { font-size: 16px; color: #ffffff; border-bottom: 1px solid #444; padding-bottom: 6px; text-transform: uppercase; }
 
-.match-card { background: var(--card-bg); width: 300px; border: 1px solid #333; position: relative; }
+.match-card { background: var(--card-bg); width: 300px; border: 1px solid #444; position: relative; }
 .match-card.on-stream { border: 2px solid var(--gold) !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-.match-card.on-stream::after {
-    content: "LIVE ON STREAM"; position: absolute; top: -14px; right: 4px;
-    background: var(--gold); color: black; font-size: 10px; font-weight: 900; padding: 2px 8px;
-}
 
 .player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding-left: 12px; border-bottom: 1px solid #000; }
-.flag-img { width: 28px; height: auto; margin-right: 10px; border-radius: 2px; }
-.name { font-size: 16px; text-transform: uppercase; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-.score { background: #232933; width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; }
+.name { font-size: 16px; text-transform: uppercase; font-weight: 700; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+.score { background: #232933; width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; color: #ffffff !important; }
 
 .winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.15); }
-.winner .score { background: var(--led-red); }
+.winner .score { background: var(--led-red); color: white; }
+.winner .name { color: #ffffff !important; }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--magenta); }
