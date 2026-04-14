@@ -29,7 +29,6 @@ async function loadPhases() {
         const res = await response.json();
         const nav = document.getElementById('phase-nav');
         nav.innerHTML = '';
-
         res.data.event.phases.forEach((p, idx) => {
             const btn = document.createElement('button');
             btn.className = `btn-phase ${idx === 0 ? 'active' : ''}`;
@@ -85,8 +84,12 @@ function renderBracket(sets) {
         rounds[key].sets.push(set);
     });
 
-    // ORDENAÇÃO MATEMÁTICA: Winners (1, 2, 3) e Losers (-4, -3, -2, -1)
-    const sortedKeys = Object.keys(rounds).sort((a, b) => rounds[a].round - rounds[b].round);
+    // CORREÇÃO DA SEQUÊNCIA: 
+    // Losers (negativos): Deve ir do mais negativo para o -1 (Ex: -4, -3, -2, -1)
+    // Winners (positivos): Deve ir do 1 para o maior (Ex: 1, 2, 3)
+    const sortedKeys = Object.keys(rounds).sort((a, b) => {
+        return rounds[a].round - rounds[b].round;
+    });
 
     sortedKeys.forEach(key => {
         const rData = rounds[key];
@@ -94,7 +97,7 @@ function renderBracket(sets) {
         col.className = 'column';
         col.innerHTML = `<div class="round-title">${rData.title}</div>`;
         
-        rData.sets.sort((a, b) => a.id - b.id).forEach(set => {
+        rData.sets.forEach(set => {
             const p1 = set.slots[0], p2 = set.slots[1];
             const s1 = p1.standing?.stats.score.value, s2 = p2.standing?.stats.score.value;
             const isDone = set.state === 3;
