@@ -1,10 +1,7 @@
 const TOKEN = "43b15884e09284466a58db7b06350b50";
-const EVENT_SLUG = "tournament/camp-teste-api/event/testeapi";
+const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/event/kzcl4-mk1-etapa-3";
 
-const COUNTRY_MAP = {
-    "Brazil": "BR", "United States": "US", "Argentina": "AR", "Chile": "CL", "Colombia": "CO", 
-    "Mexico": "MX", "Peru": "PE", "Uruguay": "UY", "Portugal": "PT", "Spain": "ES"
-};
+const COUNTRY_MAP = { "Brazil": "BR", "United States": "US", "Argentina": "AR", "Chile": "CL" };
 
 let currentPhaseId = null;
 let currentPhaseName = "";
@@ -39,7 +36,6 @@ async function loadPhases() {
                 btn.classList.add('active');
                 currentPhaseId = p.id; currentPhaseName = p.name;
                 loadSets();
-                document.getElementById('scroll-container').scrollTop = 0;
             };
             nav.appendChild(btn);
             if (idx === 0) { currentPhaseId = p.id; currentPhaseName = p.name; loadSets(); }
@@ -86,7 +82,15 @@ function renderBracket(sets) {
         rounds[key].sets.push(set);
     });
 
-    Object.keys(rounds).sort((a, b) => rounds[a].round - rounds[b].round).forEach(key => {
+    // CORREÇÃO DA ORDEM: Winners cresce (1, 2, 3) e Losers decresce para a direita (-4, -3, -2, -1)
+    const sortedKeys = Object.keys(rounds).sort((a, b) => {
+        const rA = rounds[a].round, rB = rounds[b].round;
+        if (rA > 0 && rB > 0) return rA - rB; // Winners: Ordem normal
+        if (rA < 0 && rB < 0) return rA - rB; // Losers: Ordem correta para start.gg (-4 antes de -1)
+        return rA - rB;
+    });
+
+    sortedKeys.forEach(key => {
         const rData = rounds[key];
         const col = document.createElement('div');
         col.className = 'column';
@@ -95,8 +99,7 @@ function renderBracket(sets) {
         rData.sets.forEach(set => {
             const p1 = set.slots[0], p2 = set.slots[1];
             const s1 = p1.standing?.stats.score.value, s2 = p2.standing?.stats.score.value;
-            const isDone = set.state === 3;
-            const isStream = set.state === 2 && set.stream !== null;
+            const isDone = set.state === 3, isStream = set.state === 2 && set.stream !== null;
 
             const card = document.createElement('div');
             card.className = `match-card ${isStream ? 'on-stream' : ''}`;
