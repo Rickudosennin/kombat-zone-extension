@@ -1,5 +1,5 @@
 const TOKEN = "43b15884e09284466a58db7b06350b50";
-const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/event/kzcl4-mk1-etapa-3";
+const EVENT_SLUG = "tournament/camp-teste-api/event/testeapi";
 
 const COUNTRY_MAP = {
     "Brazil": "BR", "United States": "US", "Argentina": "AR", "Chile": "CL", "Colombia": "CO", 
@@ -13,9 +13,9 @@ window.Twitch.ext.onAuthorized((auth) => { loadPhases(); });
 
 function getFlagHTML(entrant) {
     const countryName = entrant?.participants?.[0]?.user?.location?.country;
-    if (!countryName) return `<div style="width:25px; margin-right:8px;"></div>`;
+    if (!countryName) return `<div style="width:28px; margin-right:10px;"></div>`;
     const code = COUNTRY_MAP[countryName];
-    return code ? `<img src="https://flagcdn.com/w40/${code.toLowerCase()}.png" class="flag-img">` : `<div style="width:25px; margin-right:8px;"></div>`;
+    return code ? `<img src="https://flagcdn.com/w40/${code.toLowerCase()}.png" class="flag-img">` : `<div style="width:28px; margin-right:10px;"></div>`;
 }
 
 async function loadPhases() {
@@ -39,6 +39,7 @@ async function loadPhases() {
                 btn.classList.add('active');
                 currentPhaseId = p.id; currentPhaseName = p.name;
                 loadSets();
+                document.getElementById('scroll-container').scrollTop = 0;
             };
             nav.appendChild(btn);
             if (idx === 0) { currentPhaseId = p.id; currentPhaseName = p.name; loadSets(); }
@@ -78,8 +79,6 @@ function renderBracket(sets) {
     document.getElementById('phase-label').innerText = currentPhaseName.toUpperCase();
 
     const rounds = {};
-    const setMap = new Map();
-
     sets.forEach(set => {
         if (!set.slots[0].entrant) return;
         const key = `${set.round}_${set.fullRoundText}`;
@@ -97,7 +96,6 @@ function renderBracket(sets) {
             const p1 = set.slots[0], p2 = set.slots[1];
             const s1 = p1.standing?.stats.score.value, s2 = p2.standing?.stats.score.value;
             const isDone = set.state === 3;
-            // LOGICA ON STREAM
             const isStream = set.state === 2 && set.stream !== null;
 
             const card = document.createElement('div');
@@ -105,18 +103,16 @@ function renderBracket(sets) {
             card.innerHTML = `
                 <div class="player ${isDone && s1 > s2 ? 'winner' : ''}">
                     ${getFlagHTML(p1.entrant)} <span class="name">${p1.entrant.name}</span>
-                    <span class="score">${s1 < 0 ? 'DQ' : (s1 ?? '-')}</span>
+                    <span class="score">${s1 < 0 ? 'DQ' : (isDone ? s1 : '-')}</span>
                 </div>
                 <div class="player ${isDone && s2 > s1 ? 'winner' : ''}">
                     ${getFlagHTML(p2.entrant)} <span class="name">${p2.entrant?.name || 'TBD'}</span>
-                    <span class="score">${s2 < 0 ? 'DQ' : (s2 ?? '-')}</span>
+                    <span class="score">${s2 < 0 ? 'DQ' : (isDone ? s2 : '-')}</span>
                 </div>`;
             col.appendChild(card);
-            setMap.set(set.id, card);
         });
         rData.round > 0 ? wRoot.appendChild(col) : lRoot.appendChild(col);
     });
-    // Desenha as conexões após o render (opcional para extensões devido ao custo de processamento)
 }
 
 setInterval(loadSets, 60000);
