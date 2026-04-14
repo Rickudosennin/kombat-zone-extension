@@ -28,16 +28,16 @@ body {
 
 .active { background: var(--magenta) !important; box-shadow: 0 0 10px var(--magenta); }
 
-/* Solução para não cortar a parte inferior */
+/* Solução para não cortar a parte inferior e permitir navegação */
 .bracket-display { 
     width: 98%; 
     background: var(--bg-dark); 
     padding: 20px; 
     border-radius: 8px; 
     border: 1px solid #333;
-    max-height: 82vh; /* Garante que a bracket caiba na altura da live */
-    overflow-y: auto;  /* Scroll vertical se for muito alta */
-    overflow-x: auto;  /* Scroll horizontal para rounds */
+    max-height: 80vh; /* Ocupa 80% da altura da live */
+    overflow-y: auto;  /* Habilita scroll vertical */
+    overflow-x: auto;  /* Habilita scroll horizontal */
 }
 
 .label { 
@@ -58,7 +58,7 @@ body {
 .player.winner { border-left: 4px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
 .player.winner .score { background: var(--led-red); color: #fff; }
 
-/* Scrollbar Magenta */
+/* Scrollbar personalizada */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--magenta); border-radius: 10px; }
 ::-webkit-scrollbar-track { background: #000; }
