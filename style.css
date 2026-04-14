@@ -1,72 +1,56 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto+Condensed:ital,wght@1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap');
 
-:root { 
-    --magenta: #ff0055; 
-    --led-red: #ff3366; 
-    --gold: #ffd700;
+:root {
+    --magenta: #ff0055;
+    --led-red: #ff3366;
+    --bg-dark: rgba(11, 14, 19, 0.9);
+    --card-bg: #161a21;
 }
 
-/* Ajuste de Escala Automática */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: transparent !important; /* Garante transparência total para o vídeo */
+body {
+    font-family: 'Oswald', sans-serif;
+    background: transparent;
+    color: white;
+    margin: 0; padding: 20px;
+    display: flex; flex-direction: column; align-items: center;
 }
 
-body { 
-    font-family: 'Oswald', sans-serif; 
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+/* Navegação */
+.phase-nav, .bracket-filter { display: flex; gap: 10px; margin-bottom: 15px; z-index: 100; }
+.bracket-filter { display: none; }
+.bracket-filter.visible { display: flex; }
+
+.btn-phase, .btn-filter {
+    background: var(--card-bg); color: #fff; border: 2px solid var(--magenta);
+    padding: 8px 16px; cursor: pointer; font-family: 'Oswald';
+    text-transform: uppercase; font-size: 14px; transition: 0.3s;
 }
 
-/* O container principal agora tem o fundo escuro */
+.active { background: var(--magenta) !important; box-shadow: 0 0 10px var(--magenta); }
+
+/* Bracket */
 .bracket-display { 
-    width: 1920px; 
-    height: 1080px;
-    padding: 40px; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 30px;
-    transform-origin: top center; 
-    transform: scale(0.5); 
-    z-index: 10;
-    
-    /* ALTERAÇÃO AQUI: Fundo escuro apenas na área da bracket */
-    background: rgba(0, 0, 0, 0.95); 
-    border-radius: 20px;
-    box-shadow: 0 0 50px rgba(0,0,0,1);
+    width: 98%; background: var(--bg-dark); padding: 25px; 
+    border-radius: 10px; border: 1px solid #333;
 }
-
-/* Resto do código permanece igual para manter o layout que deu certo */
-.bracket-row { display: flex; gap: 40px; align-items: flex-start; flex-wrap: nowrap; position: relative; }
 
 .label { 
-    color: #ffffff; text-transform: uppercase; font-size: 32px; 
-    margin-bottom: 20px; border-left: 10px solid var(--magenta); padding-left: 20px; 
-    letter-spacing: 2px;
+    font-size: 24px; text-transform: uppercase; border-left: 6px solid var(--magenta); 
+    padding-left: 15px; margin-bottom: 20px; 
 }
 
-.column { display: flex; flex-direction: column; gap: 30px; min-width: 400px; }
-.round-title { 
-    font-size: 22px; text-transform: uppercase; color: #aaa; 
-    border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px; 
-}
+.bracket-row { display: flex; gap: 30px; overflow-x: auto; padding-bottom: 15px; }
+.column { display: flex; flex-direction: column; gap: 20px; min-width: 280px; }
+.round-title { font-size: 16px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 5px; }
 
-.match-card { 
-    background: #161a21; width: 400px; border: 2px solid #333; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
-    position: relative;
-}
+/* Cards */
+.match-card { background: var(--card-bg); border: 1px solid #333; width: 280px; }
+.player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding: 0 12px; border-bottom: 1px solid #000; }
+.name { font-size: 16px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.score { font-size: 20px; font-weight: bold; width: 40px; text-align: center; }
 
-.player { display: flex; justify-content: space-between; align-items: center; height: 70px; padding-left: 20px; border-bottom: 2px solid #000; }
-.name { font-size: 26px; text-transform: uppercase; font-weight: 700; color: white; }
-.score { background: #232933; width: 80px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 36px; color: #fff; font-weight: bold; }
+.player.winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
+.player.winner .score { color: var(--led-red); }
 
-.winner { border-left: 10px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
-.winner .score { background: var(--led-red); }
-
-.flag-img { width: 40px; height: auto; margin-right: 15px; }
+::-webkit-scrollbar { height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--magenta); border-radius: 10px; }
