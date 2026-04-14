@@ -1,9 +1,22 @@
 const TOKEN = "43b15884e09284466a58db7b06350b50";
 const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/event/kzcl4-mk1-etapa-3";
+
+const COUNTRY_MAP = {
+    "Brazil": "BR", "United States": "US", "Argentina": "AR", "Chile": "CL", "Colombia": "CO", 
+    "Mexico": "MX", "Peru": "PE", "Uruguay": "UY", "Portugal": "PT", "Spain": "ES"
+};
+
 let currentPhaseId = null;
 let currentPhaseName = "";
 
 window.Twitch.ext.onAuthorized((auth) => { loadPhases(); });
+
+function getFlagHTML(entrant) {
+    const countryName = entrant?.participants?.[0]?.user?.location?.country;
+    if (!countryName) return `<div style="width:25px; margin-right:8px;"></div>`;
+    const code = COUNTRY_MAP[countryName];
+    return code ? `<img src="https://flagcdn.com/w40/${code.toLowerCase()}.png" class="flag-img">` : `<div style="width:25px; margin-right:8px;"></div>`;
+}
 
 async function loadPhases() {
     const query = `query GetPhases($slug: String) { event(slug: $slug) { phases { id name } } }`;
@@ -17,33 +30,36 @@ async function loadPhases() {
         const nav = document.getElementById('phase-nav');
         nav.innerHTML = '';
 
-        res.data.event.phases.forEach((phase, index) => {
+        res.data.event.phases.forEach((p, idx) => {
             const btn = document.createElement('button');
-            btn.className = 'btn-phase' + (index === 0 ? ' active' : '');
-            
-            let displayName = phase.name;
-            if(displayName.toLowerCase().includes("pool")) displayName = "Pools";
-            if(displayName.toLowerCase().includes("16")) displayName = "Top 16";
-            if(displayName.toLowerCase().includes("top 8")) displayName = "Top 8";
-
-            btn.innerText = displayName;
+            btn.className = `btn-phase ${idx === 0 ? 'active' : ''}`;
+            btn.innerText = p.name;
             btn.onclick = () => {
                 document.querySelectorAll('.btn-phase').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentPhaseId = phase.id;
-                currentPhaseName = phase.name;
+                currentPhaseId = p.id; currentPhaseName = p.name;
                 loadSets();
-                document.getElementById('scroll-container').scrollTop = 0;
             };
             nav.appendChild(btn);
-            if (index === 0) { currentPhaseId = phase.id; currentPhaseName = phase.name; loadSets(); }
+            if (idx === 0) { currentPhaseId = p.id; currentPhaseName = p.name; loadSets(); }
         });
     } catch (e) { console.error("Erro Fases"); }
 }
 
 async function loadSets() {
-    if (!currentPhaseId) return;
-    const query = `query GetSets($phaseId: ID) { phase(id: $phaseId) { sets(page: 1, perPage: 65) { nodes { fullRoundText round state slots { entrant { name } standing { stats { score { value } } } } } } } }`;
+    const query = `query GetSets($phaseId: ID) {
+        phase(id: $phaseId) {
+            sets(page: 1, perPage: 100) {
+                nodes {
+                    id fullRoundText round state stream { id }
+                    slots { 
+                        entrant { name id participants { user { location { country } } } } 
+                        standing { stats { score { value } } } 
+                    }
+                }
+            }
+        }
+    }`;
     try {
         const response = await fetch('https://api.start.gg/gql/alpha', {
             method: 'POST',
@@ -51,17 +67,19 @@ async function loadSets() {
             body: JSON.stringify({ query, variables: { phaseId: currentPhaseId } }),
         });
         const res = await response.json();
-        render(res.data.phase.sets.nodes);
+        renderBracket(res.data.phase.sets.nodes);
     } catch (e) { console.error("Erro Sets"); }
 }
 
-function render(sets) {
+function renderBracket(sets) {
     const wRoot = document.getElementById('winners-root');
     const lRoot = document.getElementById('losers-root');
     wRoot.innerHTML = ''; lRoot.innerHTML = '';
     document.getElementById('phase-label').innerText = currentPhaseName.toUpperCase();
 
     const rounds = {};
+    const setMap = new Map();
+
     sets.forEach(set => {
         if (!set.slots[0].entrant) return;
         const key = `${set.round}_${set.fullRoundText}`;
@@ -69,16 +87,7 @@ function render(sets) {
         rounds[key].sets.push(set);
     });
 
-    const sortedKeys = Object.keys(rounds).sort((a, b) => {
-        const rA = rounds[a], rB = rounds[b];
-        if (a.toLowerCase().includes("reset")) return 1;
-        if (b.toLowerCase().includes("reset")) return -1;
-        if (rA.round > 0 && rB.round > 0) return rA.round - rB.round;
-        if (rA.round < 0 && rB.round < 0) return rB.round - rA.round;
-        return rA.round - rB.round;
-    });
-
-    sortedKeys.forEach(key => {
+    Object.keys(rounds).sort((a, b) => rounds[a].round - rounds[b].round).forEach(key => {
         const rData = rounds[key];
         const col = document.createElement('div');
         col.className = 'column';
@@ -86,26 +95,28 @@ function render(sets) {
         
         rData.sets.forEach(set => {
             const p1 = set.slots[0], p2 = set.slots[1];
-            const s1 = p1.standing?.stats.score.value;
-            const s2 = p2.standing?.stats.score.value;
-            const formatScore = (s) => (s < 0 ? "DQ" : (s ?? 0));
+            const s1 = p1.standing?.stats.score.value, s2 = p2.standing?.stats.score.value;
+            const isDone = set.state === 3;
+            // LOGICA ON STREAM
+            const isStream = set.state === 2 && set.stream !== null;
 
             const card = document.createElement('div');
-            card.className = 'match-card';
+            card.className = `match-card ${isStream ? 'on-stream' : ''}`;
             card.innerHTML = `
-                <div class="player ${s1 > s2 && set.state === 3 ? 'winner' : ''}">
-                    <span class="name">${p1.entrant.name}</span>
-                    <span class="score">${formatScore(s1)}</span>
+                <div class="player ${isDone && s1 > s2 ? 'winner' : ''}">
+                    ${getFlagHTML(p1.entrant)} <span class="name">${p1.entrant.name}</span>
+                    <span class="score">${s1 < 0 ? 'DQ' : (s1 ?? '-')}</span>
                 </div>
-                <div class="player ${s2 > s1 && set.state === 3 ? 'winner' : ''}">
-                    <span class="name">${p2.entrant?.name || 'TBD'}</span>
-                    <span class="score">${formatScore(s2)}</span>
+                <div class="player ${isDone && s2 > s1 ? 'winner' : ''}">
+                    ${getFlagHTML(p2.entrant)} <span class="name">${p2.entrant?.name || 'TBD'}</span>
+                    <span class="score">${s2 < 0 ? 'DQ' : (s2 ?? '-')}</span>
                 </div>`;
             col.appendChild(card);
+            setMap.set(set.id, card);
         });
-        if (rData.round > 0) wRoot.appendChild(col);
-        else lRoot.appendChild(col);
+        rData.round > 0 ? wRoot.appendChild(col) : lRoot.appendChild(col);
     });
+    // Desenha as conexões após o render (opcional para extensões devido ao custo de processamento)
 }
 
 setInterval(loadSets, 60000);
