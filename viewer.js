@@ -3,9 +3,7 @@ const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/e
 let currentPhaseName = "";
 let currentPhaseId = null;
 
-if (window.Twitch?.ext) {
-    window.Twitch.ext.onAuthorized((auth) => { loadPhases(); });
-}
+window.Twitch.ext.onAuthorized((auth) => { loadPhases(); });
 
 async function loadPhases() {
     const query = `query GetPhases($slug: String) { event(slug: $slug) { phases { id name } } }`;
@@ -22,7 +20,13 @@ async function loadPhases() {
         res.data.event.phases.forEach((phase, index) => {
             const btn = document.createElement('button');
             btn.className = 'btn-phase' + (index === 0 ? ' active' : '');
-            btn.innerText = phase.name.replace(/pool/gi, 'Pool');
+            
+            let displayName = phase.name;
+            if(displayName.toLowerCase().includes("pool")) displayName = "Pools";
+            if(displayName.toLowerCase().includes("16")) displayName = "Top 16";
+            if(displayName.toLowerCase().includes("top 8") || displayName.toLowerCase().includes("finals")) displayName = "Top 8";
+
+            btn.innerText = displayName;
             btn.onclick = () => {
                 document.querySelectorAll('.btn-phase').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
@@ -35,20 +39,21 @@ async function loadPhases() {
             if (index === 0) { 
                 currentPhaseName = phase.name.toLowerCase(); 
                 currentPhaseId = phase.id;
-                toggleFilters(); 
-                loadSets(); 
+                toggleFilters(); loadSets(); 
             }
         });
-    } catch (e) { console.error("Erro API Fases"); }
+    } catch (e) { console.error("Erro Fases"); }
 }
 
 function toggleFilters() {
     const filterDiv = document.getElementById('side-filter');
-    const isBigPhase = currentPhaseName.includes("pool") || currentPhaseName.includes("16");
-    filterDiv.classList.toggle('visible', isBigPhase);
-    document.getElementById('l-label').style.display = isBigPhase ? 'none' : 'block';
+    const lLabel = document.getElementById('l-label');
+    const isBig = currentPhaseName.includes("pool") || currentPhaseName.includes("16");
     
-    if (isBigPhase) filterSide('winners');
+    filterDiv.classList.toggle('visible', isBig);
+    lLabel.style.display = isBig ? 'none' : 'block';
+    
+    if (isBig) filterSide('winners');
     else {
         document.getElementById('w-container').style.display = 'block';
         document.getElementById('l-container').style.display = 'block';
@@ -56,15 +61,20 @@ function toggleFilters() {
 }
 
 function filterSide(side) {
+    const w = document.getElementById('w-container');
+    const l = document.getElementById('l-container');
     document.getElementById('btn-win').classList.toggle('active', side === 'winners');
     document.getElementById('btn-los').classList.toggle('active', side === 'losers');
-    document.getElementById('w-container').style.display = side === 'winners' ? 'block' : 'none';
-    document.getElementById('l-container').style.display = side === 'losers' ? 'block' : 'none';
+    
+    w.style.display = side === 'winners' ? 'block' : 'none';
+    l.style.display = side === 'losers' ? 'block' : 'none';
+    
+    // Reseta o scroll para o topo ao trocar de lado
+    document.getElementById('scroll-container').scrollTop = 0;
 }
 
 async function loadSets() {
-    if (!currentPhaseId) return;
-    const query = `query GetSets($phaseId: ID) { phase(id: $phaseId) { sets(page: 1, perPage: 60) { nodes { fullRoundText round state slots { entrant { name } standing { stats { score { value } } } } } } } }`;
+    const query = `query GetSets($phaseId: ID) { phase(id: $phaseId) { sets(page: 1, perPage: 65) { nodes { fullRoundText round state slots { entrant { name } standing { stats { score { value } } } } } } } }`;
     try {
         const response = await fetch('https://api.start.gg/gql/alpha', {
             method: 'POST',
@@ -73,7 +83,7 @@ async function loadSets() {
         });
         const res = await response.json();
         render(res.data.phase.sets.nodes);
-    } catch (e) { console.error("Erro API Sets"); }
+    } catch (e) { console.error("Erro Sets"); }
 }
 
 function render(sets) {
@@ -95,7 +105,7 @@ function render(sets) {
         if (a.toLowerCase().includes("reset")) return 1;
         if (b.toLowerCase().includes("reset")) return -1;
         if (rA.round > 0 && rB.round > 0) return rA.round - rB.round;
-        if (rA.round < 0 && rB.round < 0) return rB.round - rA.round; // Correção da Losers
+        if (rA.round < 0 && rB.round < 0) return rB.round - rA.round;
         return rA.round - rB.round;
     });
 
@@ -104,14 +114,25 @@ function render(sets) {
         const col = document.createElement('div');
         col.className = 'column';
         col.innerHTML = `<div class="round-title">${rData.title}</div>`;
+        
         rData.sets.forEach(set => {
             const p1 = set.slots[0], p2 = set.slots[1];
-            const s1 = p1.standing?.stats.score.value, s2 = p2.standing?.stats.score.value;
+            const s1 = p1.standing?.stats.score.value;
+            const s2 = p2.standing?.stats.score.value;
+
+            const formatScore = (s) => (s < 0 ? "DQ" : (s ?? 0));
+
             const card = document.createElement('div');
             card.className = 'match-card';
             card.innerHTML = `
-                <div class="player ${s1 > s2 && set.state === 3 ? 'winner' : ''}"><span class="name">${p1.entrant.name}</span><span class="score">${s1 ?? 0}</span></div>
-                <div class="player ${s2 > s1 && set.state === 3 ? 'winner' : ''}"><span class="name">${p2.entrant?.name || 'TBD'}</span><span class="score">${s2 ?? 0}</span></div>`;
+                <div class="player ${s1 > s2 && set.state === 3 ? 'winner' : ''}">
+                    <span class="name">${p1.entrant.name}</span>
+                    <span class="score">${formatScore(s1)}</span>
+                </div>
+                <div class="player ${s2 > s1 && set.state === 3 ? 'winner' : ''}">
+                    <span class="name">${p2.entrant?.name || 'TBD'}</span>
+                    <span class="score">${formatScore(s2)}</span>
+                </div>`;
             col.appendChild(card);
         });
         if (rData.round > 0) wRoot.appendChild(col);
@@ -119,4 +140,4 @@ function render(sets) {
     });
 }
 
-setInterval(loadSets, 30000);
+setInterval(loadSets, 60000);
