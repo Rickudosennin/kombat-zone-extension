@@ -3,19 +3,23 @@ const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/e
 
 const COUNTRY_MAP = {
     "Brazil": "BR", "United States": "US", "Argentina": "AR", "Chile": "CL", "Colombia": "CO", 
-    "Mexico": "MX", "Peru": "PE", "Uruguay": "UY", "Portugal": "PT", "Spain": "ES"
+    "Mexico": "MX", "Peru": "PE", "Uruguay": "UY", "Portugal": "PT", "Spain": "ES", "Germany": "DE"
 };
 
 let currentPhaseId = null;
-let currentPhaseName = "";
+
+// Atalho H para mostrar menu de fases
+window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'h') document.getElementById('phase-nav').classList.toggle('show-nav');
+});
 
 window.Twitch.ext.onAuthorized((auth) => { loadPhases(); });
 
 function getFlagHTML(entrant) {
     const countryName = entrant?.participants?.[0]?.user?.location?.country;
-    if (!countryName) return `<div style="width:28px; margin-right:10px;"></div>`;
+    if (!countryName) return `<div style="width:32px; margin-right:12px;"></div>`;
     const code = COUNTRY_MAP[countryName];
-    return code ? `<img src="https://flagcdn.com/w40/${code.toLowerCase()}.png" style="width:28px; height:auto; border-radius:2px; margin-right:10px;">` : `<div style="width:28px; margin-right:10px;"></div>`;
+    return code ? `<img src="https://flagcdn.com/w40/${code.toLowerCase()}.png" class="flag-img">` : `<div style="width:32px; margin-right:12px;"></div>`;
 }
 
 async function loadPhases() {
@@ -36,11 +40,11 @@ async function loadPhases() {
             btn.onclick = () => {
                 document.querySelectorAll('.btn-phase').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentPhaseId = p.id; currentPhaseName = p.name;
+                currentPhaseId = p.id;
                 loadSets();
             };
             nav.appendChild(btn);
-            if (idx === 0) { currentPhaseId = p.id; currentPhaseName = p.name; loadSets(); }
+            if (idx === 0) { currentPhaseId = p.id; loadSets(); }
         });
     } catch (e) { console.error("Erro Fases"); }
 }
@@ -74,7 +78,6 @@ function renderBracket(sets) {
     const wRoot = document.getElementById('winners-root');
     const lRoot = document.getElementById('losers-root');
     wRoot.innerHTML = ''; lRoot.innerHTML = '';
-    document.getElementById('phase-label').innerText = currentPhaseName.toUpperCase();
 
     const rounds = {};
     sets.forEach(set => {
@@ -84,11 +87,14 @@ function renderBracket(sets) {
         rounds[key].sets.push(set);
     });
 
-    // CORREÇÃO DA SEQUÊNCIA: 
-    // Losers (negativos): Deve ir do mais negativo para o -1 (Ex: -4, -3, -2, -1)
-    // Winners (positivos): Deve ir do 1 para o maior (Ex: 1, 2, 3)
+    // LÓGICA DE ORDENAÇÃO CORRIGIDA:
+    // Losers (Negativos): -4, -3, -2, -1 (Cronológico)
+    // Winners (Positivos): 1, 2, 3 (Cronológico)
     const sortedKeys = Object.keys(rounds).sort((a, b) => {
-        return rounds[a].round - rounds[b].round;
+        const rA = rounds[a].round;
+        const rB = rounds[b].round;
+        if (rA < 0 && rB < 0) return rA - rB; // Mantém a ordem crescente dos negativos
+        return rA - rB;
     });
 
     sortedKeys.forEach(key => {
@@ -97,11 +103,11 @@ function renderBracket(sets) {
         col.className = 'column';
         col.innerHTML = `<div class="round-title">${rData.title}</div>`;
         
-        rData.sets.forEach(set => {
+        rData.sets.sort((a, b) => a.id - b.id).forEach(set => {
             const p1 = set.slots[0], p2 = set.slots[1];
             const s1 = p1.standing?.stats.score.value, s2 = p2.standing?.stats.score.value;
             const isDone = set.state === 3;
-            const isStream = set.state === 2 && set.stream !== null;
+            const isStream = (set.state === 2 || set.state === 1) && set.stream !== null;
 
             const card = document.createElement('div');
             card.className = `match-card ${isStream ? 'on-stream' : ''}`;
@@ -122,4 +128,4 @@ function renderBracket(sets) {
     });
 }
 
-setInterval(loadSets, 60000);
+setInterval(loadSets, 30000);
