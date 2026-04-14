@@ -15,6 +15,13 @@ window.Twitch.ext.onAuthorized((auth) => {
     loadPhases();
 });
 
+// Força atualização ao voltar para a aba
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'visible') {
+        loadSets();
+    }
+});
+
 function getFlagHTML(entrant) {
     const countryName = entrant?.participants?.[0]?.user?.location?.country;
     if (!countryName) return `<div style="width:35px; height:20px; margin-right:12px; background:rgba(255,255,255,0.05);"></div>`;
@@ -34,7 +41,6 @@ async function loadPhases() {
         const res = await response.json();
         if (res.data?.event?.phases) {
             const allPhases = res.data.event.phases;
-            // Busca Automática do TOP 8
             const top8 = allPhases.find(p => p.name.toLowerCase().includes("top 8") || p.name.toLowerCase().includes("finals"));
             phasesList = top8 ? [top8] : allPhases;
             if (!currentPhaseId) changePhase(phasesList[0].id);
@@ -87,8 +93,14 @@ function renderBracket(sets) {
         rounds[key].sets.push(set);
     });
 
+    // Ordenação corrigida para colocar o Reset no final
     const sortedKeys = Object.keys(rounds).sort((a, b) => {
         const rA = rounds[a], rB = rounds[b];
+        
+        // Se for Grand Final Reset, joga para o fim da Winners
+        if (a.toLowerCase().includes("reset")) return 1;
+        if (b.toLowerCase().includes("reset")) return -1;
+
         if (rA.round > 0 && rB.round > 0) return rA.round - rB.round;
         if (rA.round < 0 && rB.round < 0) return rB.round - rA.round;
         return rA.round - rB.round;
