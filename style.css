@@ -2,69 +2,41 @@
 
 :root { 
     --magenta: #ff0055; 
-    --bg-solid: rgba(11, 14, 19, 0.98); /* Fundo escuro restabelecido */
+    --bg-solid: rgba(11, 14, 19, 0.98); 
     --led-red: #ff3366; 
     --gold: #ffd700;
     --card-bg: #161a21;
 }
 
-body { 
-    font-family: 'Oswald', sans-serif; 
-    background: transparent; 
-    color: white; 
-    margin: 0; padding: 0;
-    overflow: hidden;
-}
+body { font-family: 'Oswald', sans-serif; background: transparent; margin: 0; overflow: hidden; }
 
 .phase-nav { 
-    display: flex; gap: 10px; padding: 10px; 
-    justify-content: center; background: rgba(0,0,0,0.9);
-    border-bottom: 2px solid var(--magenta);
+    display: flex; gap: 10px; padding: 10px; justify-content: center; 
+    background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--magenta);
 }
 
 .btn-phase { 
-    background: #222; color: #aaa; border: 1px solid #444; 
-    padding: 6px 14px; cursor: pointer; text-transform: uppercase; 
-    font-size: 13px; font-family: 'Oswald';
+    background: #222; color: #aaa; border: 1px solid #444; padding: 6px 14px; 
+    cursor: pointer; text-transform: uppercase; font-size: 13px; font-family: 'Oswald';
 }
 .btn-phase.active { background: var(--magenta); color: white; border-color: white; }
 
-/* Container com Fundo Escuro e Scroll */
 .bracket-display { 
-    width: 95%;
-    margin: 10px auto;
-    padding: 30px; 
-    background: var(--bg-solid); /* Aplicação do fundo escuro */
-    border-radius: 8px;
-    border: 1px solid #333;
-    display: flex; flex-direction: column; gap: 20px; 
-    max-height: 78vh; 
-    overflow: auto; 
-    position: relative;
+    width: 95%; margin: 10px auto; padding: 30px; background: var(--bg-solid);
+    border: 1px solid #333; display: flex; flex-direction: column; 
+    max-height: 78vh; overflow: auto; position: relative;
 }
 
-.label { 
-    font-size: 24px; text-transform: uppercase; border-left: 8px solid var(--magenta); 
-    padding-left: 15px; margin-bottom: 20px; 
-}
-
-.bracket-row { display: flex; gap: 50px; align-items: flex-start; position: relative; }
-.column { display: flex; flex-direction: column; gap: 30px; min-width: 300px; position: relative; }
+.label { font-size: 24px; text-transform: uppercase; border-left: 8px solid var(--magenta); padding-left: 15px; margin-bottom: 20px; }
+.bracket-row { display: flex; gap: 50px; align-items: flex-start; }
+.column { display: flex; flex-direction: column; gap: 30px; min-width: 300px; }
 .round-title { font-size: 16px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 6px; }
 
-/* Match Cards e On Stream */
-.match-card { 
-    background: var(--card-bg); width: 300px; border: 1px solid #333; 
-    position: relative; z-index: 20; 
-}
-.match-card.on-stream {
-    border: 2px solid var(--gold) !important;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-}
+.match-card { background: var(--card-bg); width: 300px; border: 1px solid #333; position: relative; }
+.match-card.on-stream { border: 2px solid var(--gold) !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
 .match-card.on-stream::after {
     content: "LIVE ON STREAM"; position: absolute; top: -14px; right: 4px;
-    background: var(--gold); color: black; font-size: 10px; font-weight: 900;
-    padding: 2px 8px; border-radius: 2px;
+    background: var(--gold); color: black; font-size: 10px; font-weight: 900; padding: 2px 8px;
 }
 
 .player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding-left: 12px; border-bottom: 1px solid #000; }
@@ -75,11 +47,5 @@ body {
 .winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.15); }
 .winner .score { background: var(--led-red); }
 
-/* LEDs e Scrollbar */
-#connectors-container { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
-.connector { position: absolute; background: #333; overflow: hidden; }
-.led-flow { position: absolute; background: var(--led-red); box-shadow: 0 0 10px var(--led-red); animation: led-animation 2s linear infinite; }
-
-@keyframes led-animation { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--magenta); }
