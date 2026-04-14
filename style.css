@@ -1,83 +1,68 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap');
 
 :root {
     --magenta: #ff0055;
-    --bg-solid: #0b0e13;
-    --card-bg: #161a21;
     --led-red: #ff3366;
-    --gold: #ffd700;
+    --bg-dark: rgba(11, 14, 19, 0.95);
+    --card-bg: #161a21;
 }
 
 body {
-    background: var(--bg-solid);
-    color: white;
     font-family: 'Oswald', sans-serif;
-    margin: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow-x: hidden; /* Scroll vertical permitido, horizontal controlado na bracket */
+    background: transparent;
+    color: white;
+    margin: 0; 
+    padding: 10px 15px; /* Reduzi o padding superior */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
 }
 
-/* Navegação de Fases */
-.phase-nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    display: flex; gap: 15px; padding: 20px;
-    background: rgba(0, 0, 0, 0.95); border-bottom: 4px solid var(--magenta);
-    z-index: 2000; transition: 0.3s; transform: translateY(-100%); opacity: 0;
+.phase-nav { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 20px; 
+    margin-top: 5px; /* Sobe os botões de fase */
 }
-.phase-nav.show-nav { transform: translateY(0); opacity: 1; }
 
 .btn-phase {
-    background: #222; color: #aaa; border: 1px solid #444;
-    padding: 10px 20px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald';
+    background: var(--card-bg); color: #fff; border: 2px solid var(--magenta);
+    padding: 6px 14px; cursor: pointer; font-family: 'Oswald';
+    text-transform: uppercase; font-size: 13px; transition: 0.2s;
 }
-.btn-phase.active { background: var(--magenta); color: white; border-color: white; }
 
-/* Estrutura da Bracket e Scroll */
+.active { background: var(--magenta) !important; box-shadow: 0 0 10px var(--magenta); }
+
+/* Ajuste de posicionamento e scroll */
 .bracket-display { 
-    padding: 60px 40px; 
-    overflow-x: auto; /* Ativa o scroll horizontal */
-    white-space: nowrap; 
+    width: 98%; 
+    background: var(--bg-dark); 
+    padding: 20px; 
+    border-radius: 8px; 
+    border: 1px solid #333;
+    max-height: 75vh; /* Diminuído para garantir que suba e não corte embaixo */
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-top: 0; /* Garante que a bracket suba o máximo possível */
 }
 
-.bracket-row { display: inline-flex; gap: 60px; align-items: flex-start; margin-bottom: 50px; }
-.column { display: flex; flex-direction: column; gap: 40px; min-width: 420px; }
-
-.label {
-    color: #ffffff; text-transform: uppercase; font-size: 28px;
-    margin-bottom: 15px; border-left: 8px solid var(--magenta); padding-left: 15px;
+.label { 
+    font-size: 22px; text-transform: uppercase; border-left: 6px solid var(--magenta); 
+    padding-left: 12px; margin-bottom: 15px; 
 }
 
-.round-title {
-    font-size: 20px; text-transform: uppercase; color: #fff;
-    border-bottom: 2px solid #444; padding-bottom: 8px; margin-bottom: 15px;
-}
+.bracket-row { display: flex; gap: 25px; align-items: flex-start; }
+.column { display: flex; flex-direction: column; gap: 18px; min-width: 260px; }
+.round-title { font-size: 15px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 4px; }
 
-/* Cards e Jogadores */
-.match-card {
-    background: var(--card-bg); width: 420px; border: 2px solid #333;
-    position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-}
+.match-card { background: var(--card-bg); border: 1px solid #333; width: 260px; }
+.player { display: flex; justify-content: space-between; align-items: center; height: 45px; padding: 0 10px; border-bottom: 1px solid #000; }
+.name { font-size: 14px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+.score { font-size: 18px; font-weight: bold; width: 35px; text-align: center; background: #232933; height: 100%; display: flex; align-items: center; justify-content: center; }
 
-.match-card.on-stream { border-color: var(--gold) !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-.match-card.on-stream::after {
-    content: "LIVE ON STREAM"; position: absolute; top: -18px; right: -2px;
-    background: var(--gold); color: black; font-size: 11px; font-weight: 900; padding: 2px 10px;
-}
+.player.winner { border-left: 4px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
+.player.winner .score { background: var(--led-red); color: #fff; }
 
-.player { display: flex; justify-content: space-between; align-items: center; height: 65px; padding-left: 20px; border-bottom: 2px solid #000; }
-.name { font-size: 24px; text-transform: uppercase; font-weight: 700; }
-.flag-img { width: 35px; height: auto; margin-right: 12px; border-radius: 3px; }
-
-.score { background: #232933; width: 70px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: bold; }
-
-.winner { border-left: 8px solid var(--led-red); background: rgba(255, 51, 102, 0.15); }
-.winner .score { background: var(--led-red); }
-
-/* Conectores LED */
-.connector { position: absolute; background: #333; z-index: 1; overflow: hidden; }
-.led-flow { 
-    position: absolute; background: var(--led-red); width: 100%; height: 100%;
-    box-shadow: 0 0 10px var(--led-red); animation: led-flow 2s linear infinite; 
-}
-@keyframes led-flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--magenta); border-radius: 10px; }
+::-webkit-scrollbar-track { background: #000; }
