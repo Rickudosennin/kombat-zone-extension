@@ -11,16 +11,21 @@ body {
     font-family: 'Oswald', sans-serif;
     background: transparent;
     color: white;
-    margin: 0; padding: 15px;
-    display: flex; flex-direction: column; align-items: center;
+    margin: 0; 
+    padding: 10px 15px; /* Reduzi o padding superior */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
 }
 
-/* Navegação e Filtros */
-.phase-nav, .bracket-filter { display: flex; gap: 8px; margin-bottom: 12px; z-index: 1000; }
-.bracket-filter { display: none; }
-.bracket-filter.visible { display: flex; }
+.phase-nav { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 20px; 
+    margin-top: 5px; /* Sobe os botões de fase */
+}
 
-.btn-phase, .btn-filter {
+.btn-phase {
     background: var(--card-bg); color: #fff; border: 2px solid var(--magenta);
     padding: 6px 14px; cursor: pointer; font-family: 'Oswald';
     text-transform: uppercase; font-size: 13px; transition: 0.2s;
@@ -28,16 +33,17 @@ body {
 
 .active { background: var(--magenta) !important; box-shadow: 0 0 10px var(--magenta); }
 
-/* Solução para não cortar a parte inferior e permitir navegação */
+/* Ajuste de posicionamento e scroll */
 .bracket-display { 
     width: 98%; 
     background: var(--bg-dark); 
     padding: 20px; 
     border-radius: 8px; 
     border: 1px solid #333;
-    max-height: 80vh; /* Ocupa 80% da altura da live */
-    overflow-y: auto;  /* Habilita scroll vertical */
-    overflow-x: auto;  /* Habilita scroll horizontal */
+    max-height: 75vh; /* Diminuído para garantir que suba e não corte embaixo */
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-top: 0; /* Garante que a bracket suba o máximo possível */
 }
 
 .label { 
@@ -49,7 +55,6 @@ body {
 .column { display: flex; flex-direction: column; gap: 18px; min-width: 260px; }
 .round-title { font-size: 15px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 4px; }
 
-/* Match Cards */
 .match-card { background: var(--card-bg); border: 1px solid #333; width: 260px; }
 .player { display: flex; justify-content: space-between; align-items: center; height: 45px; padding: 0 10px; border-bottom: 1px solid #000; }
 .name { font-size: 14px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
@@ -58,7 +63,6 @@ body {
 .player.winner { border-left: 4px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
 .player.winner .score { background: var(--led-red); color: #fff; }
 
-/* Scrollbar personalizada */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--magenta); border-radius: 10px; }
 ::-webkit-scrollbar-track { background: #000; }
