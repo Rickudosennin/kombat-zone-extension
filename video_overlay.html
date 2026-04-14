@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
@@ -8,17 +8,19 @@
 <body>
     <div class="phase-nav" id="phase-nav"></div>
 
-    <div class="bracket-display" id="scroll-container">
+    <div class="bracket-display">
         <div id="winners-area">
-            <div class="label" id="phase-label">Winners Bracket</div>
+            <div class="label">Winners Bracket</div>
             <div id="winners-root" class="bracket-row"></div>
         </div>
-
-        <div id="losers-area" style="margin-top: 50px; border-top: 1px solid #333; padding-top: 30px;">
-            <div class="label">Losers Bracket</div>
+        
+        <div id="losers-area">
+            <div class="label" style="margin-top: 30px;">Losers Bracket</div>
             <div id="losers-root" class="bracket-row"></div>
         </div>
     </div>
+
+    <div id="connectors-container"></div>
 
     <script src="viewer.js"></script>
 </body>
