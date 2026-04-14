@@ -1,29 +1,7 @@
 const TOKEN = "43b15884e09284466a58db7b06350b50";
 const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/event/kzcl4-mk1-etapa-3";
-let currentPhaseName = "";
 let currentPhaseId = null;
-
-// Função de troca de abas anexada ao window para o HTML encontrar
-window.filterSide = function(side) {
-    const w = document.getElementById('w-container');
-    const l = document.getElementById('l-container');
-    const btnWin = document.getElementById('btn-win');
-    const btnLos = document.getElementById('btn-los');
-    const scroll = document.getElementById('scroll-container');
-
-    if (side === 'winners') {
-        w.style.setProperty('display', 'block', 'important');
-        l.style.setProperty('display', 'none', 'important');
-        btnWin.classList.add('active');
-        btnLos.classList.remove('active');
-    } else {
-        w.style.setProperty('display', 'none', 'important');
-        l.style.setProperty('display', 'block', 'important');
-        btnWin.classList.remove('active');
-        btnLos.classList.add('active');
-    }
-    if (scroll) scroll.scrollTop = 0; // Volta ao topo no scroll
-};
+let currentPhaseName = "";
 
 window.Twitch.ext.onAuthorized((auth) => { loadPhases(); });
 
@@ -46,43 +24,25 @@ async function loadPhases() {
             let displayName = phase.name;
             if(displayName.toLowerCase().includes("pool")) displayName = "Pools";
             if(displayName.toLowerCase().includes("16")) displayName = "Top 16";
-            if(displayName.toLowerCase().includes("top 8") || displayName.toLowerCase().includes("finals")) displayName = "Top 8";
+            if(displayName.toLowerCase().includes("top 8")) displayName = "Top 8";
 
             btn.innerText = displayName;
             btn.onclick = () => {
                 document.querySelectorAll('.btn-phase').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentPhaseName = phase.name.toLowerCase();
                 currentPhaseId = phase.id;
-                toggleFilters();
+                currentPhaseName = phase.name;
                 loadSets();
+                document.getElementById('scroll-container').scrollTop = 0;
             };
             nav.appendChild(btn);
-            if (index === 0) { 
-                currentPhaseName = phase.name.toLowerCase(); 
-                currentPhaseId = phase.id;
-                toggleFilters(); loadSets(); 
-            }
+            if (index === 0) { currentPhaseId = phase.id; currentPhaseName = phase.name; loadSets(); }
         });
-    } catch (e) { console.error("Erro ao carregar fases"); }
-}
-
-function toggleFilters() {
-    const filterDiv = document.getElementById('side-filter');
-    const lLabel = document.getElementById('l-label');
-    const isBig = currentPhaseName.includes("pool") || currentPhaseName.includes("16");
-    
-    filterDiv.classList.toggle('visible', isBig);
-    lLabel.style.display = isBig ? 'none' : 'block';
-    
-    if (isBig) window.filterSide('winners');
-    else {
-        document.getElementById('w-container').style.display = 'block';
-        document.getElementById('l-container').style.display = 'block';
-    }
+    } catch (e) { console.error("Erro Fases"); }
 }
 
 async function loadSets() {
+    if (!currentPhaseId) return;
     const query = `query GetSets($phaseId: ID) { phase(id: $phaseId) { sets(page: 1, perPage: 65) { nodes { fullRoundText round state slots { entrant { name } standing { stats { score { value } } } } } } } }`;
     try {
         const response = await fetch('https://api.start.gg/gql/alpha', {
@@ -92,7 +52,7 @@ async function loadSets() {
         });
         const res = await response.json();
         render(res.data.phase.sets.nodes);
-    } catch (e) { console.error("Erro ao carregar jogos"); }
+    } catch (e) { console.error("Erro Sets"); }
 }
 
 function render(sets) {
@@ -128,8 +88,6 @@ function render(sets) {
             const p1 = set.slots[0], p2 = set.slots[1];
             const s1 = p1.standing?.stats.score.value;
             const s2 = p2.standing?.stats.score.value;
-
-            // Transforma score negativo em DQ
             const formatScore = (s) => (s < 0 ? "DQ" : (s ?? 0));
 
             const card = document.createElement('div');
@@ -150,5 +108,4 @@ function render(sets) {
     });
 }
 
-// Atualização automática a cada 60 segundos
 setInterval(loadSets, 60000);
