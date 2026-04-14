@@ -42,14 +42,14 @@ body {
 .column { display: flex; flex-direction: column; gap: 30px; min-width: 300px; }
 .round-title { 
     font-size: 16px; color: #ffffff; border-bottom: 1px solid #444; 
-    padding-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;
+    padding-bottom: 6px; text-transform: uppercase;
 }
 
 .match-card { background: var(--card-bg); width: 300px; border: 1px solid #444; position: relative; }
 .match-card.on-stream { border: 2px solid var(--gold) !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
 .match-card.on-stream::after {
     content: "LIVE ON STREAM"; position: absolute; top: -14px; right: 4px;
-    background: var(--gold); color: black; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 2px;
+    background: var(--gold); color: black; font-size: 10px; font-weight: 900; padding: 2px 8px;
 }
 
 .player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding-left: 12px; border-bottom: 1px solid #000; }
@@ -64,7 +64,6 @@ body {
 
 .winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.15); }
 .winner .score { background: var(--led-red); color: #ffffff; }
-.winner .name { color: #ffffff !important; }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--magenta); }
