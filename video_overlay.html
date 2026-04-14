@@ -2,7 +2,6 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Kombat Zone Overlay - Teste</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
 </head>
@@ -14,24 +13,18 @@
         <button class="btn-filter" id="btn-los" onclick="filterSide('losers')">Losers Bracket</button>
     </div>
 
-    <div class="bracket-display" id="main-display">
+    <div class="bracket-display" id="scroll-container">
         <div id="w-container">
-            <div class="label" id="phase-label">A carregar...</div>
+            <div class="label" id="phase-label">CARREGANDO...</div>
             <div id="winners-root" class="bracket-row"></div>
         </div>
+
         <div id="l-container" style="margin-top: 40px;">
-            <div class="label" id="l-label">Losers Bracket</div>
+            <div class="label" id="l-label">LOSERS BRACKET</div>
             <div id="losers-root" class="bracket-row"></div>
         </div>
     </div>
 
     <script src="viewer.js"></script>
-    <script>
-        // Simulação para teste fora da Twitch
-        if (!window.Twitch?.ext?.onAuthorized) {
-            console.log("Modo de teste local ativo");
-            setTimeout(loadPhases, 500);
-        }
-    </script>
 </body>
 </html>
