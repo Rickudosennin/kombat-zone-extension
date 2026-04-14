@@ -3,7 +3,7 @@
 :root {
     --magenta: #ff0055;
     --led-red: #ff3366;
-    --bg-dark: rgba(11, 14, 19, 0.9);
+    --bg-dark: rgba(11, 14, 19, 0.95);
     --card-bg: #161a21;
 }
 
@@ -11,46 +11,54 @@ body {
     font-family: 'Oswald', sans-serif;
     background: transparent;
     color: white;
-    margin: 0; padding: 20px;
+    margin: 0; padding: 15px;
     display: flex; flex-direction: column; align-items: center;
 }
 
-/* Navegação */
-.phase-nav, .bracket-filter { display: flex; gap: 10px; margin-bottom: 15px; z-index: 100; }
+/* Navegação e Filtros */
+.phase-nav, .bracket-filter { display: flex; gap: 8px; margin-bottom: 12px; z-index: 1000; }
 .bracket-filter { display: none; }
 .bracket-filter.visible { display: flex; }
 
 .btn-phase, .btn-filter {
     background: var(--card-bg); color: #fff; border: 2px solid var(--magenta);
-    padding: 8px 16px; cursor: pointer; font-family: 'Oswald';
-    text-transform: uppercase; font-size: 14px; transition: 0.3s;
+    padding: 6px 14px; cursor: pointer; font-family: 'Oswald';
+    text-transform: uppercase; font-size: 13px; transition: 0.2s;
 }
 
 .active { background: var(--magenta) !important; box-shadow: 0 0 10px var(--magenta); }
 
-/* Bracket */
+/* Solução para não cortar a parte inferior */
 .bracket-display { 
-    width: 98%; background: var(--bg-dark); padding: 25px; 
-    border-radius: 10px; border: 1px solid #333;
+    width: 98%; 
+    background: var(--bg-dark); 
+    padding: 20px; 
+    border-radius: 8px; 
+    border: 1px solid #333;
+    max-height: 82vh; /* Garante que a bracket caiba na altura da live */
+    overflow-y: auto;  /* Scroll vertical se for muito alta */
+    overflow-x: auto;  /* Scroll horizontal para rounds */
 }
 
 .label { 
-    font-size: 24px; text-transform: uppercase; border-left: 6px solid var(--magenta); 
-    padding-left: 15px; margin-bottom: 20px; 
+    font-size: 22px; text-transform: uppercase; border-left: 6px solid var(--magenta); 
+    padding-left: 12px; margin-bottom: 15px; 
 }
 
-.bracket-row { display: flex; gap: 30px; overflow-x: auto; padding-bottom: 15px; }
-.column { display: flex; flex-direction: column; gap: 20px; min-width: 280px; }
-.round-title { font-size: 16px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 5px; }
+.bracket-row { display: flex; gap: 25px; align-items: flex-start; }
+.column { display: flex; flex-direction: column; gap: 18px; min-width: 260px; }
+.round-title { font-size: 15px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 4px; }
 
-/* Cards */
-.match-card { background: var(--card-bg); border: 1px solid #333; width: 280px; }
-.player { display: flex; justify-content: space-between; align-items: center; height: 50px; padding: 0 12px; border-bottom: 1px solid #000; }
-.name { font-size: 16px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.score { font-size: 20px; font-weight: bold; width: 40px; text-align: center; }
+/* Match Cards */
+.match-card { background: var(--card-bg); border: 1px solid #333; width: 260px; }
+.player { display: flex; justify-content: space-between; align-items: center; height: 45px; padding: 0 10px; border-bottom: 1px solid #000; }
+.name { font-size: 14px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+.score { font-size: 18px; font-weight: bold; width: 35px; text-align: center; background: #232933; height: 100%; display: flex; align-items: center; justify-content: center; }
 
-.player.winner { border-left: 5px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
-.player.winner .score { color: var(--led-red); }
+.player.winner { border-left: 4px solid var(--led-red); background: rgba(255, 51, 102, 0.1); }
+.player.winner .score { background: var(--led-red); color: #fff; }
 
-::-webkit-scrollbar { height: 6px; }
+/* Scrollbar Magenta */
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--magenta); border-radius: 10px; }
+::-webkit-scrollbar-track { background: #000; }
