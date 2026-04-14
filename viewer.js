@@ -3,6 +3,28 @@ const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/e
 let currentPhaseName = "";
 let currentPhaseId = null;
 
+// Função de troca de abas anexada ao window para o HTML encontrar
+window.filterSide = function(side) {
+    const w = document.getElementById('w-container');
+    const l = document.getElementById('l-container');
+    const btnWin = document.getElementById('btn-win');
+    const btnLos = document.getElementById('btn-los');
+    const scroll = document.getElementById('scroll-container');
+
+    if (side === 'winners') {
+        w.style.setProperty('display', 'block', 'important');
+        l.style.setProperty('display', 'none', 'important');
+        btnWin.classList.add('active');
+        btnLos.classList.remove('active');
+    } else {
+        w.style.setProperty('display', 'none', 'important');
+        l.style.setProperty('display', 'block', 'important');
+        btnWin.classList.remove('active');
+        btnLos.classList.add('active');
+    }
+    if (scroll) scroll.scrollTop = 0; // Volta ao topo no scroll
+};
+
 window.Twitch.ext.onAuthorized((auth) => { loadPhases(); });
 
 async function loadPhases() {
@@ -42,7 +64,7 @@ async function loadPhases() {
                 toggleFilters(); loadSets(); 
             }
         });
-    } catch (e) { console.error("Erro Fases"); }
+    } catch (e) { console.error("Erro ao carregar fases"); }
 }
 
 function toggleFilters() {
@@ -53,24 +75,11 @@ function toggleFilters() {
     filterDiv.classList.toggle('visible', isBig);
     lLabel.style.display = isBig ? 'none' : 'block';
     
-    if (isBig) filterSide('winners');
+    if (isBig) window.filterSide('winners');
     else {
         document.getElementById('w-container').style.display = 'block';
         document.getElementById('l-container').style.display = 'block';
     }
-}
-
-function filterSide(side) {
-    const w = document.getElementById('w-container');
-    const l = document.getElementById('l-container');
-    document.getElementById('btn-win').classList.toggle('active', side === 'winners');
-    document.getElementById('btn-los').classList.toggle('active', side === 'losers');
-    
-    w.style.display = side === 'winners' ? 'block' : 'none';
-    l.style.display = side === 'losers' ? 'block' : 'none';
-    
-    // Reseta o scroll para o topo ao trocar de lado
-    document.getElementById('scroll-container').scrollTop = 0;
 }
 
 async function loadSets() {
@@ -83,7 +92,7 @@ async function loadSets() {
         });
         const res = await response.json();
         render(res.data.phase.sets.nodes);
-    } catch (e) { console.error("Erro Sets"); }
+    } catch (e) { console.error("Erro ao carregar jogos"); }
 }
 
 function render(sets) {
@@ -120,6 +129,7 @@ function render(sets) {
             const s1 = p1.standing?.stats.score.value;
             const s2 = p2.standing?.stats.score.value;
 
+            // Transforma score negativo em DQ
             const formatScore = (s) => (s < 0 ? "DQ" : (s ?? 0));
 
             const card = document.createElement('div');
@@ -140,4 +150,5 @@ function render(sets) {
     });
 }
 
+// Atualização automática a cada 60 segundos
 setInterval(loadSets, 60000);
