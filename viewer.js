@@ -1,5 +1,5 @@
 const TOKEN = "43b15884e09284466a58db7b06350b50";
-const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-4-mk1-edition-3/event/kzcl4-mk1-etapa-3";
+const EVENT_SLUG = "tournament/kombat-zone-circuito-das-lendas-sf6-edition-top8/event/kzcl-sf6-top8";
 let currentPhaseId = null;
 let currentPhaseName = "";
 
