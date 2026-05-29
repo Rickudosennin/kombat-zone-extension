@@ -466,11 +466,7 @@
             { "label": "Super Smash Bros. Ultimate", "value": "SSBU", "videogameId": 1386 }, { "label": "Super Street Fighter II Turbo", "value": "ST", "videogameId": 33 },
             { "label": "Tekken 7", "value": "TEKKEN7", "videogameId": 17, "hidden": true }, { "label": "Tekken 8", "value": "TEKKEN8", "videogameId": 49783 },
             { "label": "The King of Fighters XV", "value": "KOF XV", "videogameId": 36963 }, { "label": "Ultimate Marvel vs. Capcom 3", "value": "UMVC3", "videogameId": 10, "hidden": true },
-            { "label": "Under Night In-Birth II Sys:Celes", "value": "UNISC", "videogameId": 50203 },{
-  "label": "Vampire Savior",
-  "value": "VSAVIOR",
-  "videogameId": 11602
-}
+            { "label": "Under Night In-Birth II Sys:Celes", "value": "UNISC", "videogameId": 50203 },{ "label": "Vampire Savior", "value": "VSAVIOR", "videogameId": 11602 }
         ];
         const southAmericanCountries = ["Brazil","Argentina","Chile","Colombia","Peru","Uruguay","Paraguay","Ecuador","Bolivia","Venezuela"];
 
